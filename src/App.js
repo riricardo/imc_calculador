@@ -1,10 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {ScrollView, View, Text, TextInput, Button, Alert} from 'react-native';
 
 const App = () => {
   const [peso, setPeso] = useState('');
   const [altura, setAltura] = useState('');
   const [imc, setImc] = useState('');
+  const input_ = useRef();
 
   useEffect(() => {
     if (peso !== '' && altura !== '') {
@@ -63,11 +64,33 @@ const App = () => {
     return tipoImc;
   };
 
-  const verificaImcHandler = () => {
-    setPeso('');
-    setAltura('');
-    Alert.alert('Resultado', `IMC: ${imc}, ${testaImc()}`);
-    setImc('');
+  const onPressVerificaImcHandler = () => {
+    Alert.alert(
+      'Resultado',
+      `IMC: ${imc}, ${testaImc()}`,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {
+            console.log('cancel');
+          },
+        },
+        {
+          text: 'Ok',
+          onPress: () => {
+            setPeso('');
+            setAltura('');
+            setImc('');
+            onFocus();
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const onFocus = () => {
+    input_.current.focus();
   };
 
   return (
@@ -75,6 +98,7 @@ const App = () => {
       {exibirPeso()}
       <TextInput
         value={peso}
+        ref={input_}
         keyboardType="numeric"
         placeholder="Digite o peso"
         onChangeText={onChangePesoHandler}
@@ -89,7 +113,10 @@ const App = () => {
       />
 
       <View>
-        <Button title="Verificar IMC" onPress={() => verificaImcHandler()} />
+        <Button
+          title="Verificar IMC"
+          onPress={() => onPressVerificaImcHandler()}
+        />
       </View>
     </ScrollView>
   );
